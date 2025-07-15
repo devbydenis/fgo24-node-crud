@@ -35,7 +35,7 @@ exports.login = function (req, res) {
       message: "Email or password is incorrect",
     });
   }
-  
+
   return res.status(http.HTTP_STATUS_OK).json({
     success: true,
     message: "User logged in successfully",
