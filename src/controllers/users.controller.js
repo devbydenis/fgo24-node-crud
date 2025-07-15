@@ -5,15 +5,45 @@ const {
   createUser,
   updateUser,
   deleteUser,
+  searchUsers
 } = require("../models/users.model");
+const { parse } = require("path");
 
-exports.getAllUsers = function (_req, res) {
+exports.getAllUsers = function (req, res) {
+  const {search, sortby, limit, page} = req.query;
+  const startIndex = (parseInt(page) - 1) * parseInt(limit);
+  const lastIndex = parseInt(page) * parseInt(limit);
   const users = getUsers();
+  const sliceUsers = users.slice(startIndex, lastIndex);
+  console.log(sliceUsers);
+  let searchedUsers = [];
+
+  if (search) {
+    searchedUsers = sliceUsers.filter(user => user.username.includes(search));
+  }
+
+  if (sortby === "ascending") {
+    searchedUsers.length > 0 
+      ?  searchedUsers = [...searchedUsers].sort((a, b) => a.username.localeCompare(b.username))
+      : searchedUsers = [...sliceUsers].sort((a, b) => a.username.localeCompare(b.username));
+  } else if (sortby === "descending") {
+    searchedUsers.length > 0 
+      ? searchedUsers = [...searchedUsers].sort((a, b) => b.username.localeCompare(a.username))
+      : searchedUsers = [...sliceUsers].sort((a, b) => b.username.localeCompare(a.username));
+  }
+
+  const pageInfo = {
+    totalPage: searchedUsers.length > 0 ? searchedUsers.length : users.length,
+    currentPage: parseInt(page),
+    limit: parseInt(limit),
+    item: `Showing ${sliceUsers.length} of ${users.length}`
+  };
 
   return res.status(http.HTTP_STATUS_OK).json({
     success: true,
     message: "All users",
-    results: users,
+    pageInfo: pageInfo,
+    results: searchedUsers.length > 0 ? searchedUsers : sliceUsers
   });
 };
 
