@@ -6,6 +6,7 @@ const app = express()
 app.use(express.urlencoded())
 app.use(express.json())
 
+app.use('/', require('./src/routers'))
 
 app.get('/*splat', (_req, res) => {
   return res.status(http.HTTP_STATUS_NOT_FOUND).json({
