@@ -8,6 +8,8 @@ const app = express()
 app.use(express.urlencoded())
 app.use(express.json())
 
+app.use("/uploads", express.static("uploads"))
+
 app.use('/', require('./src/routers'))
 
 app.get('/*splat', (_req, res) => {
