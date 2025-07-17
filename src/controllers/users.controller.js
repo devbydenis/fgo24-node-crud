@@ -5,7 +5,8 @@ const {
   createUser,
   updateUser,
   deleteUser,
-  searchUsers
+  searchUsers,
+  findUserByEmail
 } = require("../models/users.model");
 const { parse } = require("path");
 
@@ -67,11 +68,32 @@ exports.getUserById = function (req, res) {
 
 exports.createUser = function (req, res) {
   const {email, password, username} = req.body;
-
+  
+  if (!email || !password || !username) {
+    return res.status(http.HTTP_STATUS_BAD_REQUEST).json({
+      success: false,
+      message: "Missing required fields",
+    });
+  }
+  
+  if (findUserByEmail(email)) {
+    return res.status(http.HTTP_STATUS_BAD_REQUEST).json({
+      success: false,
+      message: "Email already exists",
+    });
+  }
+  
+  const newUser = createUser({
+    email, 
+    password, 
+    username,
+    picture: req?.file?.filename || null
+  });
+  
   return res.status(http.HTTP_STATUS_OK).json({
     success: true,
     message: "User created",
-    results: createUser({email, password, username}),
+    results: newUser,
   });
 };
 

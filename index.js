@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const express = require('express')
 const {constants: http} = require('http2')
 
@@ -15,6 +17,7 @@ app.get('/*splat', (_req, res) => {
   })
 })
 
-app.listen(8008, () => {
-  console.log('Server running on port 8008')
+const PORT = process.env.APP_PORT || 8080;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`)
 })
